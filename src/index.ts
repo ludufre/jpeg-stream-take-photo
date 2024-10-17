@@ -7,12 +7,14 @@ import { format } from "date-fns";
 const args = process.argv.slice(2);
 
 if (args.length < 2) {
-  console.error("Obrigatório informar URL e DESTINO");
+  console.error("Obrigatório informar URL e DESTINO (e MS. para esperar");
   process.exit(1);
 }
 
 const url = args[0];
 const destination = args[1];
+const wait = args?.[2] || 0;
+let startTime = Date.now();
 
 if (!fs.existsSync(destination) || !fs.statSync(destination).isDirectory()) {
   console.error("Caminho de DESTINO deve existir");
@@ -33,7 +35,7 @@ axios({
       const end = chunk.indexOf(Buffer.from([0xff, 0xd9]));
 
       // Se o início da imagem for encontrado e ainda não estamos capturando
-      if (start !== -1 && !capturing) {
+      if (start !== -1 && !capturing && startTime + Number(wait) < Date.now()) {
         capturing = true;
       }
 
